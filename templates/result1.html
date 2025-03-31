@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOCKMAN BANK</title>
+    <h3 class="totals">Total Credit: {{ extracted_data["Total Credit"] }}</h3>
+        <h3 class="totals">Total Debit: {{ extracted_data["Total Debit"] }}</h3>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: #007bff;
+          
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #d3e9ff;
+        }
+
+        .totals {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+            text-align: right;
+        }
+.filter-bar.horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: flex-start;
+    background: #fff;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid #007bff;
+    align-items: center;
+}
+
+.filter-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-inline label {
+    font-weight: 600;
+    color: #333;
+    margin-right: 0.25rem;
+}
+
+.filter-inline input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.reset-btn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+    color: #007bff;
+    background-color: white;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+
+    </style>
+</head>
+<body>
+
+    <h2>STOCKMAN BANK</h2>
+<div class="filter-bar horizontal">
+  <div class="filter-inline">
+    <label for="dateFilter">🔍 Search by Date:</label>
+    <input type="date" id="dateFilter" onchange="applyFilters()" />
+    <button onclick="resetDate()" class="reset-btn">Reset</button>
+  </div>
+
+  <div class="filter-inline">
+    <label for="descFilter">📝 Search by Description:</label>
+    <input type="text" id="descFilter" placeholder="e.g. Credit or Payment" onkeyup="applyFilters()" />
+    <button onclick="resetDesc()" class="reset-btn">Reset</button>
+  </div>
+</div>
+
+
+
+
+    {% if extracted_data.error %}
+        <p style="color:red;">Error: {{ extracted_data.error }}</p>
+    {% else %}
+
+        <h3>Account Summary</h3>
+        <table>
+            <tr><th>Date</th><th>Description</th><th>Amount</th></tr>
+            {% for row in extracted_data["Account Summary"] %}
+            <tr>
+                <td>{{ row["Date"] }}</td>
+                <td>{{ row["Description"] }}</td>
+                <td>{{ row["Amount"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h3>Deposits</h3>
+        <table>
+            <tr><th>Date</th><th>Description</th><th>Amount</th></tr>
+            {% for row in extracted_data["Deposits"] %}
+            <tr>
+                <td>{{ row["Date"] }}</td>
+                <td>{{ row["Description"] }}</td>
+                <td>{{ row["Amount"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h3>Other Credits</h3>
+        <table>
+        
+            <tr><th>Date</th><th>Description</th><th>Amount</th></tr>
+            {% for row in extracted_data["Other Credits"] %}
+            <tr>
+                <td>{{ row["Date"] }}</td>
+                <td>{{ row["Description"] }}</td>
+                <td>{{ row["Amount"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h3>Other Debits</h3>
+        <table>
+       
+            <tr><th>Date</th><th>Description</th><th>Amount</th></tr>
+            {% for row in extracted_data["Other Debits"] %}
+            <tr>
+                <td>{{ row["Date"] }}</td>
+                <td>{{ row["Description"] }}</td>
+                <td>{{ row["Amount"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h3>Daily Balances</h3>
+        <table>
+            <tr><th>Date</th><th>Amount</th></tr>
+            {% for row in extracted_data["Daily Balances"] %}
+            <tr>
+                <td>{{ row["Date"] }}</td>
+                <td>{{ row["Amount"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h3>Merged Transactions</h3>
+        <table id="mergedTransactionsTable">
+        
+            <tr><th>Date</th><th>Description</th><th>Amount</th><th>Type</th></tr>
+            {% for row in extracted_data["Merged Transactions"] %}
+            <tr>
+                <td>{{ row["Date"] }}</td>
+                <td>{{ row["Description"] }}</td>
+                <td>{{ row["Amount"] }}</td>
+                <td>{{ row["Type"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    {% endif %}
+<script>
+function applyFilters() {
+    const dateFilter = document.getElementById('dateFilter').value;
+    const descFilter = document.getElementById('descFilter').value.toLowerCase();
+
+    const table = document.getElementById('mergedTransactionsTable');
+    if (!table) return;
+
+    const rows = table.querySelectorAll('tbody tr, tr'); // Covers with or without <tbody>
+
+    rows.forEach(row => {
+        const dateCell = row.cells[0]?.textContent || '';
+        const descCell = row.cells[1]?.textContent.toLowerCase() || '';
+
+        let showRow = true;
+
+        if (dateFilter && !dateCell.startsWith(dateFilter)) {
+            showRow = false;
+        }
+
+        if (descFilter && !descCell.includes(descFilter)) {
+            showRow = false;
+        }
+
+        row.style.display = showRow ? '' : 'none';
+    });
+}
+
+// Optional Reset Helpers
+function resetDate() {
+    document.getElementById('dateFilter').value = '';
+    applyFilters();
+}
+
+function resetDesc() {
+    document.getElementById('descFilter').value = '';
+    applyFilters();
+}
+</script>
+
+
+<script>
+function cleanDescriptions() {
+    const allTables = document.querySelectorAll('table');
+
+    allTables.forEach((table) => {
+        const rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const descCell = row.cells[1];
+            if (descCell) {
+                let original = descCell.textContent.trim();
+
+                // ✂️ Remove from 'tf Member' up to '(continued)', inclusive
+                const cleaned = original.replace(/tf Member[\s\S]*?\(continued\)/gi, '').trim();
+
+                descCell.textContent = cleaned;
+            }
+        });
+    });
+}
+
+// 🔁 Run when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    cleanDescriptions();
+});
+</script>
+
+
+
+</body>
+</html>
